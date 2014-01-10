@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<script src="http://www.stuartathompson.com/globedev/base/jquery.js" type="text/javascript"></script>
+<link rel="stylesheet" href="http://beta.images.theglobeandmail.com/media/www/css/global.fonts.css">
+<link rel="stylesheet" href="http://beta.images.theglobeandmail.com/static/templates/css/embeddablefix.css?10" charset="utf8"/>
+
+
+<script src="http://beta.images.theglobeandmail.com/static/national/summitseries1972/js/jquery.isotope.min.js"></script>
+<script src="http://beta.images.theglobeandmail.com/static/templates/js/miso.ds.deps.ie.min.0.3.0.js"></script>
+<script type="text/javascript" src="http://partners.theglobeandmail.com/interactives/debatemoments/jquery.cookie.js"></script>
+
+<style type="text/css">
+#gi{
+	width:620px;
+}
+.gi-section{
+	padding:40px 0 60px;
+	float:left;
+	clear:both;
+	width:100%;
+}
+.gi-image img{
+	width:100%;
+	border:1px solid #ececec;
+}
+.gi-vote-container{
+	clear:both;
+	width:100%;
+	float:left;
+}
+.gi-vote-container.alreadyVoted .gi-vote-place{
+	display:block;
+}
+.gi-vote-container.alreadyVoted .gi-button{
+	display:none;
+}
+.gi-vote-button{
+	float:left;
+	width:15%;
+	margin:10px;
+	text-align:left;
+}
+.gi-vote-place{
+	display:none;
+	text-align:center;
+	font-family:Arial,Helvetica,sans-serif;
+	color:#5E5E5E;
+	font-size:13px;
+}
+.gi-vote-place-label{
+	font-size:28px;
+	font-family:"PrattHeavy",Georgia,sans-serif;
+	line-height:1;
+	color:black;
+}
+.gi-vote-place-label span{
+	font-size:19px;
+	font-family:"PrattRegular",Georgia,sans-serif;
+}
+.gi-vote-text{
+	float: right;
+	width: 75%;
+	margin:10px;
+	border-left:1px solid #ececec;
+	padding-left:20px;
+}
+.gi-vote-text h3{
+	margin-top:0 !important;
+	font-weight:normal !important;
+}
+.gi-vote-text h3 span{
+	font-family:"PrattRegular",sans-serif;
+	font-size:14px;
+}
+.gi-button{
+font-family:Arial,Helvetica,sans-serif;
+padding: 6px 12px;
+position: block;
+width:50%;
+margin-bottom: 0;
+font-size: 14px;
+font-weight: normal;
+line-height: 1.428571429;
+text-align: center;
+white-space: nowrap;
+vertical-align: middle;
+cursor: pointer;
+background-image: none;
+border: 1px solid transparent;
+border-radius: 4px;
+-webkit-user-select: none;
+-moz-user-select: none;
+-ms-user-select: none;
+-o-user-select: none;
+user-select: none;
+color: #fff;
+background-color: #5cb85c;
+border-color: #4cae4c;
+margin:0 auto;
+}
+.gi-button:hover{
+	background-color:#429E42;
+}
+.gi-loader{
+	width: 16px;
+	margin: 10px auto;
+	display:none;
+}
+a.gi-reorder{
+	background-color:#ededed;
+	border:1px solid #dcdcdc;
+	border-radius:3px;
+	-moz-border-radius:3px;
+	-webkit-border-radius:3px;
+	font-family:"PrattHeavy",sans-serif;
+	display:block;
+	margin:10px auto;
+	font-size:12px;
+	color:#828282;
+}
+
+/* Smartphones -------------------------------*/
+@media screen and (max-width: 480px) {
+	#gi, .gi-vote-text, .gi-vote-button,.gi-vote-place{
+		width:100%;
+	}
+	.gi-vote-button{
+		text-align:right;
+		width:100%;
+		margin:0 !important;
+	}
+	.gi-vote-text{
+		margin:0;
+	}
+	.gi-vote-place{
+		text-align: right;
+	}
+	.gi-vote-place-label{
+		font-size:26px;
+	}
+	.gi-button{
+		display:block;
+		float:right;
+		width:30%;
+		margin:0 auto;
+		padding:5px 0;
+	}
+	.gi-loader{
+		display:none !important;
+	}
+	.gi-reorder{
+		padding: 3px;
+		float:right;
+	}
+}
+</style>
+
+<script type="text/javascript">
+$('document').ready(function(){
+function sortByKey(array, key) {
+	return array.sort(function(a, b) {
+        var x = a[key]; var y = b[key];
+        return ((x > y) ? -1 : ((x < y) ? 1 : 0));
+    });
+}
+function shuffle(sourceArray) {
+    for (var n = 0; n < sourceArray.length - 1; n++) {
+        var k = n + Math.floor(Math.random() * (sourceArray.length - n));
+
+        var temp = sourceArray[k];
+        sourceArray[k] = sourceArray[n];
+        sourceArray[n] = temp;
+    }
+}
+
+/* - Variables - */
+var interactiveId = 8; // Database number
+
+var voteData = [
+	{
+		name:'Andrew Edgecombe',
+		title:'Creative Director, identity designer',
+		website:'www.andyedge.com',
+		content:'Toronto’s ever-changing landscape defines the city for me. How quickly it grows. It is a city under construction. Reflected here by fragmented letters – it shows the city is still young in areas, but established in others. Hence the use of upper and lower case. You got it! That is a person in the centre of the wordmark with hands on their head thinking about the future of the city. The stacking characters reflect growth. The “TO” letters are connected by the strength in the neighbourhoods. We’re quickly moving, the best is still to come, reflected in the streamlined forms.<p>Together it creates a friendly, welcoming logo for Toronto.'
+	},
+	{
+		name:'Kait Bos',
+		title:'Graphic designer',
+		website:'www.kaitbos.com',
+		content:'I moved here nine years ago and have had various feelings towards Toronto, ranging from confusion to love, which I think is a common newcomer’s experience. I wanted to create a logo that reflected my feelings, Toronto’s diversity, as well as fit within the Canadian landscape. So I combined well-loved symbology. The layering of the leaves and colour differentiation show the intricacy of Toronto and the layout shows how we all come together as one city.'
+	},
+	{
+		name:'Mark Ruivo',
+		title:'Owner, Creative marketing specialist, Graphic Juice',
+		website:'www.graphicjuice.com',
+		content:'The main objective for this logo design is to show how multicultural a city like Toronto really is. The use of different rainbow-coloured letters was chosen to captures this. A striped path crossing the entire logo symbolizes a new beginning, peace and fortune.'
+	},
+	{
+		name:'Matthew Blackett',
+		title:'Publisher and creative director, Spacing Media',
+		website:'www.spacing.ca',
+		content:'Toronto is known for its neighbourhoods. Officially, the city recognizes 140 neighbourhoods, so there are 140 circles in the logo representing each of those.<p>I used the grid format for the circles because the city is laid out in a grid pattern, and I chose circles to play on the idea of Toronto as a “city within a park”, a current tagline (in landscape-design plans, a tree is represented by a circle). Lastly, the colours used are traditional Toronto blue colours used by the Leafs, Blue Jays and Argos.<p>I like the idea of the neighbourhoods (circles) making up the letter T. What I often hear — but also believe — is that our neighbourhoods often blend into one another. This is why I chose to use a gradient blend with the cyan/royal blue colours.'
+	},
+	{
+		name:'Clarice Gomes',
+		title:'Graphic and web designer',
+		website:'www.claricegomes.ca',
+		content:'This logo is based on ‘The Crystal Entrance’ of the Royal Ontario Museum, a museum of world culture and natural history. The structure appropriately represents Toronto’s multicultural population, but it also encompasses Toronto’s flare for the arts. The attraction brings more than one million visitors annually, and it is a historical building dating back to 1912. Today, the museum is Canada\'s largest field-research institution, with research and conservation activities that span the globe.'
+	},
+	{
+		name:'Matthew Bambach',
+		title:'Graphics editor, The Globe and Mail',
+		website:'',
+		content:'The shape of the logo itself is a more geometric version of Toronto’s boundaries, and I randomly connected a bunch of points within the boundary like a network. I meant for this to symbolize how the city doesn’t really seem to have a central identity, and yet there are lots of random influences that are still interconnected. Blue was an obvious choice, since it’s the city’s unofficial colour and I chose various shades to represent the different cultures blending together in the city. I chose Futura font for the word mark since it is close to the TTC subway font, which I’ve found to be a unique visual signifier.'
+	},
+	{
+		name:'Matthew Daley',
+		title:'Illustrator',
+		website:'www.shinypliers.com',
+		content:'This idea was inspired by the view from my studio in my apartment. It’s an observation of the amount of cranes I see everywhere, due to the city’s present building boom and an exaggerated perspective of them crowding out the skyline. I wouldn’t call it a critique of the boom, especially considering that I live in a condo tower.'
+	},
+	{
+		name:'Matt Webb',
+		title:'Designer',
+		website:'www.mdwebb.ca',
+		content:'Even before Crackgate, Rob Ford\'s Toronto was basically a circus (complete with dreams of a Ferris wheel!). We should probably just embrace the madness.'
+	},
+	{
+		name:'Max Young',
+		title:'Junior Graphic Designer, JWT Toronto',
+		website:'www.mdwebb.ca',
+		content:'The logo aims to pay tribute to Toronto’s past while incorporating the city’s modern values. The five-sided form comes from the city’s original five wards, (Toronto’s early neighbourhoods), and mimics the shape of Fort York, a structure that played an integral part in the founding of the city. The logo’s overlapping ‘ribbons’ symbolize modern Toronto’s multiculturalism.<p>Tones of blue are used in order to have a connection with Toronto’s past branding as well as its major sports teams. A splash of red is added to indicate the city’s important role within Canadian identity.'
+	}
+];
+
+// Check if already voted
+var alreadyVoted = false;
+
+if($.cookie('globe_interactive_id_' + interactiveId) != null) alreadyVoted = true;
+
+// Prepare dataset
+var data = [],
+	voteOrder = [],
+	totalVotes = 0,
+	originalOrder = [],
+	votedItem,
+	placeSuffixes = ['','st','nd','rd','th','th','th','th','th','th'];
+$.getJSON('http://partners.theglobeandmail.com/interactives/database/voting/loaddata.php?interactives_id=' + interactiveId + '&callback=?',function(data){
+	// Parse response
+	data = jQuery.parseJSON(data);
+	// Get vote percentages, totals and order
+	getVotePercent(data);
+	// Shuffle order if nothing picked
+	if(!alreadyVoted) shuffle(data);
+	// Create interactive
+	createInteractive(data);
+})
+
+// Store vote percentages and totals
+function getVotePercent(data){
+	// Sort by votes
+	data = sortByKey(data,'votes');
+	$.each(data,function(i,d){
+		totalVotes+=parseInt(d.votes);
+		originalOrder.push({'id':d.id,'votes':parseInt(d.votes)});
+	})
+}
+// Create interactive
+function createInteractive(data){
+	$.each(data,function(i,d){
+		content = '';
+		alreadyVotedClass = '';
+		if(alreadyVoted) alreadyVotedClass = 'alreadyVoted';
+		var percent = Math.round((d.votes/totalVotes)*100);
+		if(isNaN(percent)) percent = 0;
+		var thisSection;
+		$.each(voteData,function(i,cont){
+			if(cont.name == d.data_id) thisSection = cont;
+		})
+		content += '<div id="vote-' + d.id + '" class="gi-section">'
+				+ '<div class="gi-image"><img src="' + d.content2 + '" /></div>'
+				+ '<div class="gi-vote-container ' + alreadyVotedClass + '">'
+				+ '<div class="gi-vote-button">'
+				+ '<div class="gi-vote-place"><div class="gi-vote-place-label">..' + (i+1) + '</div><div class="gi-vote-place-percent" data-votes="' + d.votes + '">' + percent + '% of votes</div>'
+	   if(alreadyVoted && $.cookie('globe_interactive_id_' + interactiveId).split('-')[1] == d.id) content += '<img src="http://beta.images.theglobeandmail.com/static/templates/images/checkmark.png" />';
+				
+	   content += '</div>'
+				+ '<div class="gi-button">Vote</div>'
+				+ '<div class="gi-loader"><img src="http://beta.images.theglobeandmail.com/static/templates/images/loader.gif"></div>'
+			 	+ '</div>'
+				+ '<div class="gi-vote-text">'
+				+ '<h3>' + d.data_id;
+			if(typeof thisSection.title != 'undefined') content+= '<br /><span>' + thisSection.title + '</span>';
+	   content += '</h3>'
+				+ '<p>' + thisSection.content
+				+ ' <a href="http://' + thisSection.website + '" target="_blank">' + thisSection.website + "</a>";
+				+ '</div></div></div>';
+		$('#gi').append(content);
+	})
+	if(alreadyVoted) getNewOrder();
+}
+function getNewOrder(){
+	originalOrder = sortByKey(originalOrder,'votes');
+	var skippedItems = [],
+		tiePlaceJump = 0,
+		allRemainingTied = false;
+	var newOrder = [],
+		newOrderPlace = 0;
+	// Group items and determine order/ties
+	$.each(originalOrder, function(i,d){
+		if(typeof newOrder[d.votes] == 'undefined'){
+			newOrder[d.votes] = [d];
+			newOrderPlace++;
+		} else {
+			newOrder[d.votes].push(d);
+		}
+	});
+	// Assign new order
+	$.each(newOrder,function(i,d){
+		if(typeof d != 'undefined'){
+			var tie = '';
+			if(d.length > 1) tie = ' <span>(tie)</span>';
+			$.each(d,function(j,k){
+					var checkmark = '';
+					if(k.id == votedItem) checkmark = '<img src="http://beta.images.theglobeandmail.com/static/templates/images/checkmark.png" /> '
+					$('#vote-' + k.id).find('.gi-vote-place-label').html(checkmark + newOrderPlace+placeSuffixes[newOrderPlace.toString().slice(-1)] + tie);
+			});
+			newOrderPlace--;
+		}
+	});
+	// Update all percentages
+	$.each($('.gi-section'),function(i,d){
+		var tid = $(d).attr('id').split('-')[1];
+		// Find original vote
+		var voteAmount;
+		$.each(originalOrder,function(j,item){
+			if(item.id == tid) voteAmount = item.votes;
+		})
+		$(d).find('.gi-vote-place-percent').text(Math.round((voteAmount/totalVotes)*100) + '% of votes');
+	})
+}
+
+function reOrder(){
+	$.each(originalOrder,function(i,d){
+		var content = $('#vote-' + d.id).html();
+		$('#vote-' + d.id).remove();
+		$('#gi').append('<div class="gi-section">' + content + '</div>');
+	});
+	$('.gi-reorder').remove();
+}
+$('body').on('click','.gi-reorder',function(){
+	reOrder();
+	return false;
+})
+// Add like
+$('body').on('click','.gi-button',function(){
+	$parent = $(this).parents('.gi-section');
+	// Trigger database vote
+	$('#gi').append('<iframe src="http://partners.theglobeandmail.com/interactives/database/voting/addvote.html?interactives_id=' + interactiveId + '&id=' + $parent.attr('id').split('-')[1] + '&rand=' + Math.random() + '" width=0 height=0 frameborder=0></iframe>');
+	// Add one vote to selected item and total
+	totalVotes++;
+	// Update votes in original order array
+	$.each(originalOrder,function(i,d){
+		if(d.id == $parent.attr('id').split('-')[1]) d.votes = d.votes+1;
+	});
+	// Store selection for checkmark later
+	votedItem = $parent.attr('id').split('-')[1];
+	// Add checkmark
+	$parent.find('.gi-vote-place-percent').after('<a href="#reorder" class="gi-reorder">REORDER?</a>');
+	// Determine new places
+	getNewOrder();
+	// Trigger loading animation
+	$parent.find('.gi-loader').show();
+	setTimeout(function(){
+		$('.gi-button,.gi-loader').hide();
+		$('.gi-vote-place').show();
+	},500);
+	// Add cookie
+	$.cookie('globe_interactive_id_' + interactiveId,$parent.attr('id'));
+	return false;
+})
+
+})
+</script>
+
+
+<!-- Remove me --><div class="embeddableContent"><!-- Remove Me -->
+
+
+<div id="gi">
+		
+</div>
+
+<!-- Remove me --></div><!-- Remove me -->
